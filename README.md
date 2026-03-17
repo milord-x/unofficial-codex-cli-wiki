@@ -5,7 +5,13 @@
   <img src="https://img.shields.io/badge/Built%20for-Codex%20CLI-black?style=for-the-badge"/>
 </p>
 
-# Codex CLI wiki
+<h1 align="center" style="font-size:60px;">Codex CLI Wiki</h1>
+
+<p align="center">
+<img src="screenshot.png" width="900">
+</p>
+
+## Codex CLI wiki
 
 Open online via GitHub Pages:
 
