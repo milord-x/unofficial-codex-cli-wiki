@@ -1,3 +1,10 @@
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-Stable-success?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Version-1.0.0-informational?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge"/>
+  <img src="https://img.shields.io/badge/Built%20for-Codex%20CLI-black?style=for-the-badge"/>
+</p>
+
 # Codex CLI wiki
 
 Open online via GitHub Pages:
