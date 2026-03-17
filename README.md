@@ -15,8 +15,8 @@
 
 Open online via GitHub Pages:
 
-- EN: https://milord-x.github.io/unofficial-codex-cli-wiki/#lang=en
-- RU: https://milord-x.github.io/unofficial-codex-cli-wiki/#lang=ru
+- EN: https://milord-x.github.io/Codex-CLI-Wiki/#lang=en
+- RU: https://https://milord-x.github.io/Codex-CLI-Wiki/#lang=ru
 
 An independent local wiki for daily work with Codex CLI: Markdown version, HTML version with search, and a `wiki codex` launcher. If you only need to read the wiki, the Pages link above is more convenient than building locally.
 
