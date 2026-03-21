@@ -3,6 +3,14 @@
   const docs = data.docs || [];
   const docsBySlug = new Map(docs.map((doc) => [doc.slug, doc]));
 
+  const LANGUAGES = [
+    { code: "en", label: "English", native: "English" },
+    { code: "ru", label: "Русский", native: "Русский" },
+    { code: "kk", label: "Қазақша", native: "Қазақша" },
+    { code: "zh", label: "中文", native: "中文" },
+    { code: "es", label: "Español", native: "Español" },
+  ];
+
   const UI = {
     en: {
       brandEyebrow: "Documentation Hub",
@@ -24,6 +32,8 @@
       buildLabel: "Updated",
       sourceLabel: "Source",
       noToc: "No headings in this document.",
+      darkMode: "Dark mode",
+      lightMode: "Light mode",
       groups: {
         all: "All",
         fundamentals: "Fundamentals",
@@ -54,6 +64,8 @@
       buildLabel: "Обновлено",
       sourceLabel: "Источник",
       noToc: "В этом документе нет заголовков.",
+      darkMode: "Тёмная тема",
+      lightMode: "Светлая тема",
       groups: {
         all: "Все",
         fundamentals: "Основы",
@@ -84,6 +96,8 @@
       buildLabel: "Жаңартылды",
       sourceLabel: "Дереккөз",
       noToc: "Бұл құжатта тақырыптар жоқ.",
+      darkMode: "Қараңғы режим",
+      lightMode: "Жарық режим",
       groups: {
         all: "Барлығы",
         fundamentals: "Негіздер",
@@ -114,6 +128,8 @@
       buildLabel: "更新于",
       sourceLabel: "来源",
       noToc: "本文档没有目录。",
+      darkMode: "深色模式",
+      lightMode: "浅色模式",
       groups: {
         all: "全部",
         fundamentals: "基础",
@@ -144,6 +160,8 @@
       buildLabel: "Actualizado",
       sourceLabel: "Fuente",
       noToc: "Este documento no tiene encabezados.",
+      darkMode: "Modo oscuro",
+      lightMode: "Modo claro",
       groups: {
         all: "Todo",
         fundamentals: "Fundamentos",
@@ -166,7 +184,6 @@
     if (stored && UI[stored]) {
       return stored;
     }
-    // Default to English always
     return "en";
   }
 
@@ -180,6 +197,7 @@
     locale: detectLocale(),
     slug: homeSlugFor(detectLocale()),
     section: "",
+    theme: localStorage.getItem("codexTheme") || "light",
   };
 
   const elements = {
@@ -198,7 +216,13 @@
     homeButton: document.getElementById("homeButton"),
     mobileToggle: document.getElementById("mobileToggle"),
     mobileToggleText: document.getElementById("mobileToggleText"),
-    langSwitch: document.getElementById("langSwitch"),
+    langDropdown: document.getElementById("langDropdown"),
+    langCurrent: document.getElementById("langCurrent"),
+    langCurrentLabel: document.getElementById("langCurrentLabel"),
+    langMenu: document.getElementById("langMenu"),
+    themeToggle: document.getElementById("themeToggle"),
+    themeIcon: document.getElementById("themeIcon"),
+    themeLabel: document.getElementById("themeLabel"),
     brandEyebrow: document.getElementById("brandEyebrow"),
     brandName: document.getElementById("brandName"),
     pageEyebrow: document.getElementById("pageEyebrow"),
@@ -244,7 +268,6 @@
   }
 
   function mirrorSlug(currentLocale, targetLocale, slug) {
-    // All docs are in English now, so just return home for other locales
     if (targetLocale !== "en") {
       return homeSlugFor(targetLocale);
     }
@@ -279,30 +302,57 @@
     return grouped;
   }
 
-  function renderLanguageSwitch() {
-    elements.langSwitch.innerHTML = "";
-    const languages = [
-      { code: "en", label: "English" },
-      { code: "ru", label: "Русский" },
-      { code: "kk", label: "Қазақша" },
-      { code: "zh", label: "中文" },
-      { code: "es", label: "Español" },
-    ];
+  // Language Dropdown
+  function renderLanguageDropdown() {
+    const currentLang = LANGUAGES.find(l => l.code === state.locale) || LANGUAGES[0];
+    elements.langCurrentLabel.textContent = currentLang.native;
     
-    languages.forEach((lang) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "lang-btn" + (state.locale === lang.code ? " active" : "");
-      button.textContent = lang.label;
-      button.setAttribute("aria-pressed", state.locale === lang.code);
-      button.setAttribute("title", UI[lang.code]?.brandEyebrow || lang.code);
-      button.addEventListener("click", function () {
-        if (lang.code === state.locale) return;
-        const nextSlug = mirrorSlug(state.locale, lang.code, state.slug || homeSlugFor(state.locale));
-        setRoute(nextSlug, "", lang.code);
+    elements.langMenu.innerHTML = "";
+    LANGUAGES.forEach((lang) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "lang-option" + (lang.code === state.locale ? " active" : "");
+      btn.innerHTML = `
+        <span class="lang-option-code">${lang.code.toUpperCase()}</span>
+        <span>${lang.native}</span>
+      `;
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (lang.code !== state.locale) {
+          const nextSlug = mirrorSlug(state.locale, lang.code, state.slug || homeSlugFor(state.locale));
+          setRoute(nextSlug, "", lang.code);
+        }
+        closeLangDropdown();
       });
-      elements.langSwitch.appendChild(button);
+      elements.langMenu.appendChild(btn);
     });
+  }
+
+  function toggleLangDropdown() {
+    elements.langDropdown.classList.toggle("open");
+  }
+
+  function closeLangDropdown() {
+    elements.langDropdown.classList.remove("open");
+  }
+
+  // Theme
+  function applyTheme() {
+    document.documentElement.setAttribute("data-theme", state.theme);
+    localStorage.setItem("codexTheme", state.theme);
+    
+    if (state.theme === "dark") {
+      elements.themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+      elements.themeLabel.textContent = ui().lightMode;
+    } else {
+      elements.themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+      elements.themeLabel.textContent = ui().darkMode;
+    }
+  }
+
+  function toggleTheme() {
+    state.theme = state.theme === "light" ? "dark" : "light";
+    applyTheme();
   }
 
   function renderFilters() {
@@ -569,11 +619,12 @@
     elements.mobileToggleText.textContent = ui().mobileToggle;
     elements.homeButton.textContent = ui().homeButton;
     elements.copyLinkButton.textContent = ui().copyLink;
+    applyTheme();
   }
 
   function render() {
     applyLocaleUi();
-    renderLanguageSwitch();
+    renderLanguageDropdown();
     const doc = docsBySlug.get(state.slug) || docsBySlug.get(homeSlugFor(state.locale));
     if (!doc) return;
     
@@ -605,6 +656,7 @@
     render();
   }
 
+  // Event Listeners
   elements.searchInput.addEventListener("input", function (e) {
     state.query = e.target.value;
     renderSearch();
@@ -630,17 +682,36 @@
     elements.sidebar.classList.toggle("open");
   });
 
+  elements.langCurrent.addEventListener("click", function (e) {
+    e.stopPropagation();
+    toggleLangDropdown();
+  });
+
+  elements.themeToggle.addEventListener("click", toggleTheme);
+
+  document.addEventListener("click", function (e) {
+    if (!elements.langDropdown.contains(e.target)) {
+      closeLangDropdown();
+    }
+  });
+
   document.addEventListener("keydown", function (e) {
     if (e.key === "/" && document.activeElement !== elements.searchInput) {
       e.preventDefault();
       elements.searchInput.focus();
       elements.searchInput.select();
     }
-    if (e.key === "Escape" && elements.sidebar.classList.contains("open")) {
-      elements.sidebar.classList.remove("open");
+    if (e.key === "Escape") {
+      closeLangDropdown();
+      if (elements.sidebar.classList.contains("open")) {
+        elements.sidebar.classList.remove("open");
+      }
     }
   });
 
   window.addEventListener("hashchange", handleHashChange);
+  
+  // Initialize
+  applyTheme();
   handleHashChange();
 })();
