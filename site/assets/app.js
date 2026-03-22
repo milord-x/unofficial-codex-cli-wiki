@@ -2,70 +2,54 @@
   const data = window.CODEX_WIKI_DATA || { docs: [], groups: [], homeSlugs: {} };
   const docs = data.docs || [];
   const docsBySlug = new Map(docs.map((doc) => [doc.slug, doc]));
-
-  const LANGUAGES = [
-    { code: "en", label: "English", native: "English" },
-    { code: "ru", label: "Русский", native: "Русский" },
-    { code: "kk", label: "Қазақша", native: "Қазақша" },
-    { code: "zh", label: "中文", native: "中文" },
-    { code: "es", label: "Español", native: "Español" },
-  ];
+  const availableLocales = Array.from(
+    new Set(
+      docs
+        .map(function (doc) {
+          return doc.locale;
+        })
+        .filter(Boolean)
+    )
+  );
+  const defaultLocale = availableLocales.includes("en") ? "en" : availableLocales[0] || "en";
 
   const UI = {
-    en: {
-      brandEyebrow: "Documentation Hub",
-      brandName: "Codex CLI Wiki",
-      pageEyebrow: "Documentation",
-      searchLabel: "Search",
-      searchPlaceholder: "Search documentation...",
-      tocEyebrow: "On this page",
-      mobileToggle: "Sections",
-      homeButton: "Home",
-      copyLink: "Copy link",
-      copied: "Copied!",
-      copyFailed: "Failed",
-      noResultsTitle: "Nothing found",
-      noResultsBody: "Try adjusting your search or filters.",
-      readmeHub: "Home",
-      markdown: "Markdown",
-      sectionsWord: "sections",
-      buildLabel: "Updated",
-      sourceLabel: "Source",
-      noToc: "No headings in this document.",
-      darkMode: "Dark mode",
-      lightMode: "Light mode",
-      groups: {
-        all: "All",
-        fundamentals: "Fundamentals",
-        cli: "CLI Reference",
-        integration: "Integration",
-        practice: "Practice",
-        examples: "Examples",
-        docs: "Documents",
-      }
-    },
     ru: {
-      brandEyebrow: "База документации",
-      brandName: "Codex CLI Wiki",
-      pageEyebrow: "Документация",
-      searchLabel: "Поиск",
-      searchPlaceholder: "Поиск по документации...",
-      tocEyebrow: "На странице",
+      brandEyebrow: "Offline knowledge system",
+      brandName: "Codex CLI wiki",
+      brandCopy:
+        "Быстрая офлайновая карта по Codex CLI: команды, workflow, skills и рабочие playbooks.",
+      pageEyebrow: "Offline HTML edition",
+      heroLead:
+        "Офлайновая витрина по Codex CLI с быстрым поиском, оглавлением по разделам и удобной навигацией между доступными версиями wiki.",
+      searchLabel: "Поиск по словам и разделам",
+      searchPlaceholder: "Например: sandbox, API key, bugfix",
+      footerLabel: "Открытие через терминал",
+      tocEyebrow: "Навигация по документу",
       mobileToggle: "Разделы",
-      homeButton: "Главная",
-      copyLink: "Копировать",
-      copied: "Скопировано!",
-      copyFailed: "Ошибка",
+      homeButton: "README",
+      copyLink: "Скопировать ссылку",
+      copied: "Скопировано",
+      copyFailed: "Не удалось",
       noResultsTitle: "Ничего не найдено",
-      noResultsBody: "Попробуйте изменить запрос или фильтры.",
-      readmeHub: "Главная",
+      noResultsBody: "Попробуй сократить запрос или переключить фильтр разделов.",
+      readmeHub: "README / Hub",
       markdown: "Markdown",
       sectionsWord: "разделов",
-      buildLabel: "Обновлено",
+      buildLabel: "Сборка",
+      openLabel: "Открытие",
       sourceLabel: "Источник",
-      noToc: "В этом документе нет заголовков.",
-      darkMode: "Тёмная тема",
-      lightMode: "Светлая тема",
+      noToc: "У этого документа нет структурного оглавления.",
+      libraryLabel: "Коллекция",
+      toolbarLabel: "Текущий документ",
+      quickLinksLabel: "Быстрые переходы",
+      docPulseLabel: "Пульс документа",
+      localeLabel: "Язык",
+      filterLabel: "Фильтр",
+      docsLabel: "Документы",
+      visibleLabel: "Видно сейчас",
+      examplesLabel: "Примеры",
+      noQuickLinks: "У этого документа пока нет быстрых переходов.",
       groups: {
         all: "Все",
         fundamentals: "Основы",
@@ -74,130 +58,95 @@
         practice: "Практика",
         examples: "Примеры",
         docs: "Документы",
-      }
+      },
     },
-    kk: {
-      brandEyebrow: "Құжаттама орталығы",
-      brandName: "Codex CLI Wiki",
-      pageEyebrow: "Құжаттама",
-      searchLabel: "Іздеу",
-      searchPlaceholder: "Құжаттамадан іздеу...",
-      tocEyebrow: "Бетте",
-      mobileToggle: "Бөлімдер",
-      homeButton: "Басты",
-      copyLink: "Сілтеме көшіру",
-      copied: "Көшірілді!",
-      copyFailed: "Қате",
-      noResultsTitle: "Ештеңе табылмады",
-      noResultsBody: "Іздеу немесе сүзгілерді өзгертіңіз.",
-      readmeHub: "Басты",
+    en: {
+      brandEyebrow: "Offline knowledge system",
+      brandName: "Codex CLI wiki",
+      brandCopy:
+        "A fast offline map for Codex CLI: commands, workflow, skills, and practical playbooks.",
+      pageEyebrow: "Offline HTML edition",
+      heroLead:
+        "An offline Codex CLI atlas with fast search, strong document hierarchy, and clean switching across available wiki locales.",
+      searchLabel: "Search by words and sections",
+      searchPlaceholder: "For example: sandbox, API key, bugfix",
+      footerLabel: "Open from terminal",
+      tocEyebrow: "Document navigation",
+      mobileToggle: "Sections",
+      homeButton: "Home",
+      copyLink: "Copy link",
+      copied: "Copied",
+      copyFailed: "Failed",
+      noResultsTitle: "Nothing found",
+      noResultsBody: "Try a shorter query or switch the section filter.",
+      readmeHub: "README / Hub",
       markdown: "Markdown",
-      sectionsWord: "бөлім",
-      buildLabel: "Жаңартылды",
-      sourceLabel: "Дереккөз",
-      noToc: "Бұл құжатта тақырыптар жоқ.",
-      darkMode: "Қараңғы режим",
-      lightMode: "Жарық режим",
+      sectionsWord: "sections",
+      buildLabel: "Build",
+      openLabel: "Open",
+      sourceLabel: "Source",
+      noToc: "No table of contents for this page.",
+      libraryLabel: "Library",
+      toolbarLabel: "Current document",
+      quickLinksLabel: "Quick jumps",
+      docPulseLabel: "Document pulse",
+      localeLabel: "Language",
+      filterLabel: "Filter",
+      docsLabel: "Docs",
+      visibleLabel: "Visible now",
+      examplesLabel: "Examples",
+      noQuickLinks: "No quick jumps for this document yet.",
       groups: {
-        all: "Барлығы",
-        fundamentals: "Негіздер",
+        all: "All",
+        fundamentals: "Fundamentals",
         cli: "CLI",
-        integration: "Интеграция",
-        practice: "Тәжірибе",
-        examples: "Мысалдар",
-        docs: "Құжаттар",
-      }
+        integration: "Integration",
+        practice: "Practice",
+        examples: "Examples",
+        docs: "Documents",
+      },
     },
-    zh: {
-      brandEyebrow: "文档中心",
-      brandName: "Codex CLI Wiki",
-      pageEyebrow: "文档",
-      searchLabel: "搜索",
-      searchPlaceholder: "搜索文档...",
-      tocEyebrow: "页面导航",
-      mobileToggle: "章节",
-      homeButton: "首页",
-      copyLink: "复制链接",
-      copied: "已复制！",
-      copyFailed: "失败",
-      noResultsTitle: "未找到结果",
-      noResultsBody: "请尝试调整搜索条件或筛选器。",
-      readmeHub: "首页",
-      markdown: "Markdown",
-      sectionsWord: "章节",
-      buildLabel: "更新于",
-      sourceLabel: "来源",
-      noToc: "本文档没有目录。",
-      darkMode: "深色模式",
-      lightMode: "浅色模式",
-      groups: {
-        all: "全部",
-        fundamentals: "基础",
-        cli: "CLI 参考",
-        integration: "集成",
-        practice: "实践",
-        examples: "示例",
-        docs: "文档",
-      }
-    },
-    es: {
-      brandEyebrow: "Centro de documentación",
-      brandName: "Codex CLI Wiki",
-      pageEyebrow: "Documentación",
-      searchLabel: "Buscar",
-      searchPlaceholder: "Buscar en la documentación...",
-      tocEyebrow: "En esta página",
-      mobileToggle: "Secciones",
-      homeButton: "Inicio",
-      copyLink: "Copiar enlace",
-      copied: "¡Copiado!",
-      copyFailed: "Error",
-      noResultsTitle: "Sin resultados",
-      noResultsBody: "Intenta ajustar tu búsqueda o filtros.",
-      readmeHub: "Inicio",
-      markdown: "Markdown",
-      sectionsWord: "secciones",
-      buildLabel: "Actualizado",
-      sourceLabel: "Fuente",
-      noToc: "Este documento no tiene encabezados.",
-      darkMode: "Modo oscuro",
-      lightMode: "Modo claro",
-      groups: {
-        all: "Todo",
-        fundamentals: "Fundamentos",
-        cli: "Referencia CLI",
-        integration: "Integración",
-        practice: "Práctica",
-        examples: "Ejemplos",
-        docs: "Documentos",
-      }
-    }
   };
+
+  function isKnownLocale(locale) {
+    return !!locale && availableLocales.includes(locale) && !!UI[locale];
+  }
 
   function detectLocale() {
     const params = new URLSearchParams(window.location.hash.replace(/^#/, ""));
     const hashLocale = params.get("lang");
-    if (hashLocale && UI[hashLocale]) {
+    if (isKnownLocale(hashLocale)) {
       return hashLocale;
     }
     const stored = window.localStorage.getItem("codexWikiLocale");
-    if (stored && UI[stored]) {
+    if (isKnownLocale(stored)) {
       return stored;
     }
-    return "en";
+    const browser = (navigator.language || "").toLowerCase();
+    const browserPrefix = browser.split("-")[0];
+    if (isKnownLocale(browserPrefix)) {
+      return browserPrefix;
+    }
+    return defaultLocale;
   }
 
   function homeSlugFor(locale) {
-    return (data.homeSlugs && data.homeSlugs[locale]) || docs[0]?.slug || "";
+    if (data.homeSlugs && data.homeSlugs[locale]) {
+      return data.homeSlugs[locale];
+    }
+    const docForLocale = docs.find(function (doc) {
+      return doc.locale === locale;
+    });
+    return (docForLocale && docForLocale.slug) || docs[0]?.slug || "";
   }
 
+  const initialLocale = detectLocale();
   const state = {
     query: "",
     group: "all",
-    locale: detectLocale(),
-    slug: homeSlugFor(detectLocale()),
+    locale: initialLocale,
+    slug: homeSlugFor(initialLocale),
     section: "",
-    theme: localStorage.getItem("codexTheme") || "light",
   };
 
   const elements = {
@@ -211,23 +160,24 @@
     docContent: document.getElementById("docContent"),
     tocList: document.getElementById("tocList"),
     tocMeta: document.getElementById("tocMeta"),
+    tocQuick: document.getElementById("tocQuick"),
     breadcrumb: document.getElementById("pageBreadcrumb"),
     copyLinkButton: document.getElementById("copyLinkButton"),
     homeButton: document.getElementById("homeButton"),
     mobileToggle: document.getElementById("mobileToggle"),
-    mobileToggleText: document.getElementById("mobileToggleText"),
-    langWrap: document.getElementById("langWrap"),
-    langBtn: document.getElementById("langBtn"),
-    langCurrentLabel: document.getElementById("langCurrentLabel"),
-    langMenu: document.getElementById("langMenu"),
-    themeToggle: document.getElementById("themeToggle"),
-    themeIcon: document.getElementById("themeIcon"),
-    themeLabel: document.getElementById("themeLabel"),
+    langSwitch: document.getElementById("langSwitch"),
     brandEyebrow: document.getElementById("brandEyebrow"),
     brandName: document.getElementById("brandName"),
+    brandCopy: document.getElementById("brandCopy"),
     pageEyebrow: document.getElementById("pageEyebrow"),
+    heroTitle: document.getElementById("heroTitle"),
+    heroLead: document.getElementById("heroLead"),
+    heroStats: document.getElementById("heroStats"),
     searchLabel: document.getElementById("searchLabel"),
+    footerLabel: document.getElementById("footerLabel"),
     tocEyebrow: document.getElementById("tocEyebrow"),
+    libraryLabel: document.getElementById("libraryLabel"),
+    toolbarLabel: document.getElementById("toolbarLabel"),
   };
 
   function ui() {
@@ -238,20 +188,34 @@
     return docs.filter((doc) => doc.locale === state.locale);
   }
 
+  function visibleDocs() {
+    return currentDocs().filter((doc) => state.group === "all" || doc.groupKey === state.group);
+  }
+
   function translateGroup(key) {
     return ui().groups[key] || key;
+  }
+
+  function totalSections(items) {
+    return items.reduce(function (count, doc) {
+      return count + (doc.headings || []).filter(function (item) {
+        return item.level >= 2;
+      }).length;
+    }, 0);
   }
 
   function decodeHash() {
     const hash = window.location.hash.replace(/^#/, "");
     const params = new URLSearchParams(hash);
     let locale = params.get("lang");
-    if (!locale || !UI[locale]) {
-      locale = state.locale;
+    if (!isKnownLocale(locale)) {
+      locale = state.locale || defaultLocale;
     }
     let slug = params.get("doc");
     const section = params.get("section") || "";
-    if (!slug || !docsBySlug.has(slug)) {
+    if (slug && docsBySlug.has(slug)) {
+      locale = docsBySlug.get(slug).locale;
+    } else {
       slug = homeSlugFor(locale);
     }
     return { locale, slug, section };
@@ -267,16 +231,33 @@
     return "#" + params.toString();
   }
 
-  function mirrorSlug(currentLocale, targetLocale, slug) {
-    if (targetLocale !== "en") {
-      return homeSlugFor(targetLocale);
+  function mirrorSlug(locale, slug) {
+    const currentDoc = docsBySlug.get(slug);
+    if (!currentDoc) {
+      return homeSlugFor(locale);
     }
-    return slug || homeSlugFor("en");
+
+    const parts = slug.split("/");
+    const hasLocalePrefix = parts.length > 1 && availableLocales.includes(parts[0]);
+    const base = hasLocalePrefix ? parts.slice(1).join("/") : slug;
+    const candidates = locale === defaultLocale ? [base, locale + "/" + base] : [locale + "/" + base, base];
+
+    for (const candidate of candidates) {
+      if (docsBySlug.has(candidate) && docsBySlug.get(candidate).locale === locale) {
+        return candidate;
+      }
+    }
+    return homeSlugFor(locale);
+  }
+
+  function closeSidebar() {
+    elements.sidebar.classList.remove("open");
   }
 
   function setRoute(slug, section, locale) {
     const actualLocale = locale || docsBySlug.get(slug)?.locale || state.locale;
     const nextHash = encodeHash(slug, section || "", actualLocale);
+    closeSidebar();
     if (window.location.hash !== nextHash) {
       window.location.hash = nextHash;
       return;
@@ -288,82 +269,36 @@
     render();
   }
 
-  function groupDocs() {
-    const grouped = new Map();
-    currentDocs().forEach((doc) => {
-      if (state.group !== "all" && doc.groupKey !== state.group) {
-        return;
-      }
-      if (!grouped.has(doc.groupKey)) {
-        grouped.set(doc.groupKey, []);
-      }
-      grouped.get(doc.groupKey).push(doc);
+  function renderLanguageSwitch() {
+    elements.langSwitch.innerHTML = "";
+    const locales = availableLocales.filter(function (locale) {
+      return !!UI[locale];
     });
-    return grouped;
-  }
+    elements.langSwitch.hidden = locales.length <= 1;
 
-  // Language Dropdown
-  function renderLanguageDropdown() {
-    const currentLang = LANGUAGES.find(l => l.code === state.locale) || LANGUAGES[0];
-    elements.langCurrentLabel.textContent = currentLang.native;
-    
-    elements.langMenu.innerHTML = "";
-    LANGUAGES.forEach((lang) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "lang-option" + (lang.code === state.locale ? " active" : "");
-      btn.innerHTML = `
-        <span class="lang-option-code">${lang.code.toUpperCase()}</span>
-        <span>${lang.native}</span>
-      `;
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (lang.code !== state.locale) {
-          const nextSlug = mirrorSlug(state.locale, lang.code, state.slug || homeSlugFor(state.locale));
-          setRoute(nextSlug, "", lang.code);
-        }
-        closeLangDropdown();
+    locales.forEach(function (locale) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "lang-button" + (state.locale === locale ? " active" : "");
+      button.textContent = locale.toUpperCase();
+      button.addEventListener("click", function () {
+        const nextSlug = mirrorSlug(locale, state.slug || homeSlugFor(state.locale));
+        setRoute(nextSlug, "", locale);
       });
-      elements.langMenu.appendChild(btn);
+      elements.langSwitch.appendChild(button);
     });
-  }
-
-  function toggleLangDropdown() {
-    elements.langWrap.classList.toggle("open");
-  }
-
-  function closeLangDropdown() {
-    elements.langWrap.classList.remove("open");
-  }
-
-  // Theme
-  function applyTheme() {
-    document.documentElement.setAttribute("data-theme", state.theme);
-    localStorage.setItem("codexTheme", state.theme);
-    
-    if (state.theme === "dark") {
-      elements.themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-      elements.themeLabel.textContent = ui().lightMode;
-    } else {
-      elements.themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-      elements.themeLabel.textContent = ui().darkMode;
-    }
-  }
-
-  function toggleTheme() {
-    state.theme = state.theme === "light" ? "dark" : "light";
-    applyTheme();
   }
 
   function renderFilters() {
     elements.filters.innerHTML = "";
-    (data.groups || []).forEach((groupKey) => {
+    (data.groups || []).forEach(function (groupKey) {
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "filter-btn" + (state.group === groupKey ? " active" : "");
+      button.className = "filter-chip" + (state.group === groupKey ? " active" : "");
       button.textContent = translateGroup(groupKey);
       button.addEventListener("click", function () {
         state.group = groupKey;
+        renderHero(docsBySlug.get(state.slug));
         renderFilters();
         renderNav();
         renderSearch();
@@ -372,41 +307,118 @@
     });
   }
 
+  function renderHero(doc) {
+    const localeDocs = currentDocs();
+    const filteredDocs = visibleDocs();
+    const examples = localeDocs.filter(function (item) {
+      return item.isExample;
+    }).length;
+
+    elements.heroTitle.textContent = ui().brandName;
+    elements.heroLead.textContent = ui().heroLead;
+    elements.heroStats.innerHTML =
+      '<div class="hero-stat-card">' +
+      '<span class="hero-stat-label">' +
+      escapeHtml(ui().visibleLabel) +
+      "</span>" +
+      '<strong class="hero-stat-value">' +
+      escapeHtml(String(filteredDocs.length)) +
+      "</strong>" +
+      '<span class="hero-stat-meta">' +
+      escapeHtml(translateGroup(state.group)) +
+      "</span>" +
+      "</div>" +
+      '<div class="hero-stat-card">' +
+      '<span class="hero-stat-label">' +
+      escapeHtml(ui().docsLabel) +
+      "</span>" +
+      '<strong class="hero-stat-value">' +
+      escapeHtml(String(localeDocs.length)) +
+      "</strong>" +
+      '<span class="hero-stat-meta">' +
+      escapeHtml(state.locale.toUpperCase()) +
+      "</span>" +
+      "</div>" +
+      '<div class="hero-stat-card">' +
+      '<span class="hero-stat-label">' +
+      escapeHtml(ui().sectionsWord) +
+      "</span>" +
+      '<strong class="hero-stat-value">' +
+      escapeHtml(String(totalSections(filteredDocs))) +
+      "</strong>" +
+      '<span class="hero-stat-meta">' +
+      escapeHtml(doc ? doc.title : ui().brandName) +
+      "</span>" +
+      "</div>" +
+      '<div class="hero-stat-card">' +
+      '<span class="hero-stat-label">' +
+      escapeHtml(ui().examplesLabel) +
+      "</span>" +
+      '<strong class="hero-stat-value">' +
+      escapeHtml(String(examples)) +
+      "</strong>" +
+      '<span class="hero-stat-meta">' +
+      escapeHtml(ui().filterLabel) +
+      ": " +
+      escapeHtml(translateGroup(state.group)) +
+      "</span>" +
+      "</div>";
+  }
+
   function renderNav() {
-    const grouped = groupDocs();
+    const grouped = new Map();
+    visibleDocs().forEach(function (doc) {
+      if (!grouped.has(doc.groupKey)) {
+        grouped.set(doc.groupKey, []);
+      }
+      grouped.get(doc.groupKey).push(doc);
+    });
+
     elements.navTree.innerHTML = "";
-    
-    if (grouped.size === 0) {
-      elements.navTree.innerHTML = '<div class="nav-empty">' + escapeHtml(ui().noResultsTitle) + '</div>';
-      return;
-    }
-    
-    for (const [groupKey, items] of grouped.entries()) {
-      const wrapper = document.createElement("div");
+    (data.groups || []).forEach(function (groupKey) {
+      if (groupKey === "all" || !grouped.has(groupKey)) {
+        return;
+      }
+      const items = grouped.get(groupKey);
+      const wrapper = document.createElement("section");
       wrapper.className = "nav-group";
-      const title = document.createElement("div");
-      title.className = "nav-group-title";
-      title.textContent = translateGroup(groupKey);
-      wrapper.appendChild(title);
-      items.forEach((doc) => {
+
+      const header = document.createElement("div");
+      header.className = "nav-group-title";
+      header.innerHTML =
+        '<span class="nav-group-name">' +
+        escapeHtml(translateGroup(groupKey)) +
+        "</span>" +
+        '<span class="nav-group-count">' +
+        escapeHtml(String(items.length)) +
+        "</span>";
+      wrapper.appendChild(header);
+
+      items.forEach(function (doc) {
         const link = document.createElement("a");
         link.className = "nav-link" + (doc.slug === state.slug ? " active" : "");
-        link.href = encodeHash(doc.slug, "", state.locale);
-        link.setAttribute("data-slug", doc.slug);
+        link.href = encodeHash(doc.slug, "", doc.locale);
         link.innerHTML =
-          '<span class="nav-link-title">' + escapeHtml(doc.title) + '</span>' +
-          '<span class="nav-link-meta">' + escapeHtml(doc.sourcePath) + '</span>';
+          '<span class="nav-link-top">' +
+          '<span class="nav-link-title">' +
+          escapeHtml(doc.title) +
+          "</span>" +
+          '<span class="nav-link-kind">' +
+          escapeHtml(doc.isReadme ? ui().readmeHub : ui().markdown) +
+          "</span>" +
+          "</span>" +
+          '<span class="nav-link-path">' +
+          escapeHtml(doc.sourcePath) +
+          "</span>";
         link.addEventListener("click", function (event) {
           event.preventDefault();
           setRoute(doc.slug, "", doc.locale);
-          if (window.innerWidth < 900) {
-            elements.sidebar.classList.remove("open");
-          }
         });
         wrapper.appendChild(link);
       });
+
       elements.navTree.appendChild(wrapper);
-    }
+    });
   }
 
   function normalizeText(value) {
@@ -418,37 +430,51 @@
     let index = -1;
     for (const token of tokens) {
       index = lower.indexOf(token);
-      if (index !== -1) break;
+      if (index !== -1) {
+        break;
+      }
     }
-    if (index === -1) return text.slice(0, 150);
-    const start = Math.max(0, index - 50);
-    const end = Math.min(text.length, index + 110);
-    return (start > 0 ? "…" : "") + text.slice(start, end).trim() + (end < text.length ? "…" : "");
+    if (index === -1) {
+      return text.slice(0, 160);
+    }
+    const start = Math.max(0, index - 60);
+    const end = Math.min(text.length, index + 120);
+    const prefix = start > 0 ? "…" : "";
+    const suffix = end < text.length ? "…" : "";
+    return prefix + text.slice(start, end).trim() + suffix;
   }
 
   function searchDocs(query) {
     const normalized = normalizeText(query);
-    if (!normalized) return [];
+    if (!normalized) {
+      return [];
+    }
 
     const tokens = normalized.split(/\s+/).filter(Boolean);
     const results = [];
 
-    currentDocs().forEach((doc) => {
-      if (state.group !== "all" && doc.groupKey !== state.group) return;
-
+    visibleDocs().forEach(function (doc) {
       let bestScore = 0;
       let bestSection = null;
 
-      (doc.sections || []).forEach((section) => {
+      (doc.sections || []).forEach(function (section) {
         const title = normalizeText(section.title);
         const text = normalizeText(section.text);
         let score = 0;
 
-        tokens.forEach((token) => {
-          if (normalizeText(doc.title).includes(token)) score += 22;
-          if (normalizeText(translateGroup(doc.groupKey)).includes(token)) score += 14;
-          if (title.includes(token)) score += 10;
-          if (text.includes(token)) score += 4;
+        tokens.forEach(function (token) {
+          if (normalizeText(doc.title).includes(token)) {
+            score += 22;
+          }
+          if (normalizeText(translateGroup(doc.groupKey)).includes(token)) {
+            score += 14;
+          }
+          if (title.includes(token)) {
+            score += 10;
+          }
+          if (text.includes(token)) {
+            score += 4;
+          }
         });
 
         if (score > bestScore) {
@@ -459,7 +485,7 @@
 
       if (bestScore > 0) {
         results.push({
-          doc,
+          doc: doc,
           section: bestSection,
           score: bestScore,
           snippet: snippetAround((bestSection && bestSection.text) || doc.text, tokens),
@@ -467,117 +493,196 @@
       }
     });
 
-    return results.sort((a, b) => b.score - a.score).slice(0, 20);
+    return results.sort(function (a, b) {
+      return b.score - a.score;
+    }).slice(0, 24);
   }
 
   function renderSearch() {
     const results = searchDocs(state.query);
     elements.searchResults.innerHTML = "";
-    
     if (!state.query.trim()) {
       elements.searchResults.classList.add("hidden");
       return;
     }
 
     elements.searchResults.classList.remove("hidden");
-
     if (!results.length) {
       const empty = document.createElement("div");
-      empty.className = "search-empty";
-      empty.innerHTML = '<span class="search-empty-icon">⊘</span>' +
-        '<span class="search-empty-title">' + escapeHtml(ui().noResultsTitle) + '</span>' +
-        '<span class="search-empty-text">' + escapeHtml(ui().noResultsBody) + '</span>';
+      empty.className = "search-result search-empty";
+      empty.innerHTML =
+        '<div class="result-topline"><span class="result-title">' +
+        escapeHtml(ui().noResultsTitle) +
+        "</span></div>" +
+        '<div class="result-snippet">' +
+        escapeHtml(ui().noResultsBody) +
+        "</div>";
       elements.searchResults.appendChild(empty);
       return;
     }
 
-    results.forEach((result) => {
+    results.forEach(function (result) {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "search-result";
       button.innerHTML =
-        '<span class="search-result-title">' + escapeHtml(result.doc.title) + '</span>' +
-        '<span class="search-result-section">' + escapeHtml(result.section?.title || translateGroup(result.doc.groupKey)) + '</span>' +
-        '<span class="search-result-snippet">' + escapeHtml(result.snippet) + '</span>';
+        '<div class="result-topline">' +
+        '<span class="result-title">' +
+        escapeHtml(result.doc.title) +
+        "</span>" +
+        '<span class="result-section">' +
+        escapeHtml(result.section ? result.section.title : translateGroup(result.doc.groupKey)) +
+        "</span>" +
+        "</div>" +
+        '<div class="result-snippet">' +
+        escapeHtml(result.snippet) +
+        "</div>" +
+        '<div class="result-path">' +
+        escapeHtml(result.doc.sourcePath) +
+        "</div>";
       button.addEventListener("click", function () {
         state.query = "";
         elements.searchInput.value = "";
         renderSearch();
-        setRoute(result.doc.slug, result.section?.id, result.doc.locale);
+        setRoute(result.doc.slug, result.section && result.section.id, result.doc.locale);
       });
       elements.searchResults.appendChild(button);
     });
   }
 
   function renderDocHeader(doc) {
-    elements.docCard.classList.toggle("is-home", !!doc.isReadme);
+    elements.docCard.classList.toggle("is-readme", !!doc.isReadme);
     elements.breadcrumb.textContent = doc.sourcePath;
 
-    const headingsCount = (doc.headings || []).filter((item) => item.level >= 2).length;
+    const headings = (doc.headings || []).filter(function (item) {
+      return item.level >= 2;
+    });
+
+    const quickLinks = headings.slice(0, 5).map(function (heading) {
+      return (
+        '<a class="jump-chip" href="' +
+        encodeHash(doc.slug, heading.id, doc.locale) +
+        '">' +
+        escapeHtml(heading.title) +
+        "</a>"
+      );
+    }).join("");
+
     elements.docHeader.innerHTML =
-      '<div class="doc-meta">' +
-        '<span class="doc-tag doc-tag--primary">' + escapeHtml(translateGroup(doc.groupKey)) + '</span>' +
-        '<span class="doc-tag">' + escapeHtml(doc.isReadme ? ui().readmeHub : ui().markdown) + '</span>' +
-        '<span class="doc-tag doc-tag--muted">' + headingsCount + ' ' + escapeHtml(ui().sectionsWord) + '</span>' +
-      '</div>' +
-      '<h1 class="doc-title">' + escapeHtml(doc.title) + '</h1>' +
-      '<p class="doc-excerpt">' + escapeHtml(doc.excerpt || "") + '</p>' +
-      '<div class="doc-footer">' +
-        '<span class="doc-source">' + escapeHtml(ui().sourceLabel) + ': <code>' + escapeHtml(doc.sourcePath) + '</code></span>' +
-        '<a href="https://github.com/milord-x/Codex-CLI-Wiki" target="_blank" rel="noreferrer" class="doc-github">GitHub ↗</a>' +
-      '</div>';
+      '<div class="doc-header-grid">' +
+      '<div class="doc-header-copy">' +
+      '<div class="eyebrow">' +
+      escapeHtml(translateGroup(doc.groupKey)) +
+      "</div>" +
+      "<h1>" +
+      escapeHtml(doc.title) +
+      "</h1>" +
+      '<div class="doc-excerpt">' +
+      escapeHtml(doc.excerpt || "") +
+      "</div>" +
+      '<div class="doc-meta-row">' +
+      '<span class="meta-pill accent">' +
+      escapeHtml(translateGroup(doc.groupKey)) +
+      "</span>" +
+      '<span class="meta-pill">' +
+      escapeHtml(doc.isReadme ? ui().readmeHub : ui().markdown) +
+      "</span>" +
+      '<span class="meta-pill">' +
+      escapeHtml(String(headings.length)) +
+      " " +
+      escapeHtml(ui().sectionsWord) +
+      "</span>" +
+      '<span class="meta-pill">' +
+      escapeHtml(doc.locale.toUpperCase()) +
+      "</span>" +
+      "</div>" +
+      '<div class="doc-jump-zone">' +
+      '<div class="jump-zone-label">' +
+      escapeHtml(ui().quickLinksLabel) +
+      "</div>" +
+      '<div class="jump-strip">' +
+      (quickLinks || '<div class="doc-quick-empty">' + escapeHtml(ui().noQuickLinks) + "</div>") +
+      "</div>" +
+      "</div>" +
+      "</div>" +
+      '<aside class="doc-spotlight">' +
+      '<div class="spotlight-label">' +
+      escapeHtml(ui().docPulseLabel) +
+      "</div>" +
+      '<div class="spotlight-title">' +
+      escapeHtml(doc.isReadme ? ui().readmeHub : doc.title) +
+      "</div>" +
+      '<div class="spotlight-grid">' +
+      '<div class="spotlight-item"><span>' +
+      escapeHtml(ui().sourceLabel) +
+      "</span><strong><code>" +
+      escapeHtml(doc.sourcePath) +
+      "</code></strong></div>" +
+      '<div class="spotlight-item"><span>' +
+      escapeHtml(ui().sectionsWord) +
+      "</span><strong>" +
+      escapeHtml(String(headings.length)) +
+      "</strong></div>" +
+      '<div class="spotlight-item"><span>' +
+      escapeHtml(ui().localeLabel) +
+      "</span><strong>" +
+      escapeHtml(doc.locale.toUpperCase()) +
+      "</strong></div>" +
+      '<div class="spotlight-item"><span>' +
+      escapeHtml(ui().openLabel) +
+      '</span><strong><code>wiki codex</code></strong></div>' +
+      "</div>" +
+      "</aside>" +
+      "</div>";
+
+    elements.docHeader.querySelectorAll(".jump-chip").forEach(function (link, index) {
+      link.style.setProperty("--jump-delay", String(index));
+      link.addEventListener("click", function (event) {
+        event.preventDefault();
+        const url = new URL(link.href);
+        const params = new URLSearchParams(url.hash.replace(/^#/, ""));
+        setRoute(doc.slug, params.get("section") || "", doc.locale);
+      });
+    });
   }
 
   function renderDocContent(doc) {
     elements.docContent.innerHTML = doc.html;
-    
-    elements.docContent.querySelectorAll('a').forEach(link => {
-      if (link.href && !link.href.startsWith('#') && !link.href.startsWith(window.location.origin)) {
-        link.target = '_blank';
-        link.rel = 'noreferrer noopener';
-      }
-    });
-    
-    // Remove HTML badges and images from README/markdown files
-    elements.docContent.querySelectorAll('p, div, h1, h2').forEach(el => {
-      const html = el.innerHTML || '';
-      if (el.tagName === 'P' && el.querySelector('code, strong, em, a:not(img)')) return;
-      if (el.tagName === 'H1' && el.textContent.length > 10) return;
-      if (el.tagName === 'H2' && el.textContent.length > 10) return;
-      
-      if (html.includes('shields.io') || html.includes('img.shields')) {
-        el.remove();
-        return;
-      }
-      
-      if (el.tagName === 'P' && el.querySelector('img') && el.querySelectorAll('img, a').length <= 2) {
-        const imgs = el.querySelectorAll('img');
-        const isOnlyImages = Array.from(imgs).every(img => 
-          img.src.includes('.png') || img.src.includes('.jpg') || img.src.includes('.gif')
-        );
-        if (isOnlyImages) {
-          el.remove();
-        }
-      }
-    });
-    
-    const firstH1 = elements.docContent.querySelector('h1');
-    if (firstH1 && (firstH1.innerHTML.includes('img') || firstH1.textContent.includes('Badge'))) {
-      firstH1.remove();
-    }
   }
 
   function renderToc(doc) {
-    const headings = (doc.headings || []).filter((item) => item.level <= 4);
+    const headings = (doc.headings || []).filter(function (item) {
+      return item.level <= 4;
+    });
     elements.tocList.innerHTML = "";
 
+    elements.tocQuick.innerHTML =
+      '<div class="toc-quick-card">' +
+      '<span class="toc-quick-label">' +
+      escapeHtml(ui().filterLabel) +
+      "</span>" +
+      '<strong class="toc-quick-value">' +
+      escapeHtml(translateGroup(doc.groupKey)) +
+      "</strong>" +
+      "</div>" +
+      '<div class="toc-quick-card">' +
+      '<span class="toc-quick-label">' +
+      escapeHtml(ui().sectionsWord) +
+      "</span>" +
+      '<strong class="toc-quick-value">' +
+      escapeHtml(String(headings.length)) +
+      "</strong>" +
+      "</div>";
+
     if (!headings.length) {
-      elements.tocList.innerHTML = '<div class="toc-empty">' + escapeHtml(ui().noToc) + '</div>';
+      elements.tocList.innerHTML = '<div class="toc-empty">' + escapeHtml(ui().noToc) + "</div>";
     } else {
-      headings.forEach((heading) => {
+      headings.forEach(function (heading) {
         const link = document.createElement("a");
         link.href = encodeHash(doc.slug, heading.id, doc.locale);
-        link.className = "toc-link toc-link--" + Math.min(Math.max(heading.level, 1), 4) +
+        link.className =
+          "toc-link level-" +
+          Math.min(Math.max(heading.level, 1), 4) +
           (heading.id === state.section ? " active" : "");
         link.textContent = heading.title;
         link.addEventListener("click", function (event) {
@@ -588,8 +693,20 @@
       });
     }
 
-    const updatedDate = (data.generatedAt || "").split("T")[0];
-    elements.tocMeta.innerHTML = '<span class="toc-date">' + escapeHtml(ui().buildLabel) + ': <time>' + escapeHtml(updatedDate) + '</time></span>';
+    elements.tocMeta.innerHTML =
+      escapeHtml(ui().buildLabel) +
+      ": <code>" +
+      escapeHtml(formatBuildTime(data.generatedAt || "")) +
+      "</code><br />" +
+      escapeHtml(ui().openLabel) +
+      ': <code>wiki codex</code>';
+  }
+
+  function formatBuildTime(value) {
+    if (!value) {
+      return "";
+    }
+    return value.replace("T", " ").replace("Z", " UTC");
   }
 
   function focusSection(sectionId) {
@@ -599,39 +716,47 @@
     }
     requestAnimationFrame(function () {
       const target = document.getElementById(sectionId);
-      if (!target) return;
-      target.classList.remove("highlight");
-      void target.offsetWidth;
-      target.classList.add("highlight");
+      if (!target) {
+        return;
+      }
+      target.classList.remove("section-highlight");
+      target.classList.add("section-highlight");
       target.scrollIntoView({ behavior: "smooth", block: "start" });
-      setTimeout(function () { target.classList.remove("highlight"); }, 1200);
+      setTimeout(function () {
+        target.classList.remove("section-highlight");
+      }, 1400);
     });
   }
 
   function applyLocaleUi() {
     document.documentElement.lang = state.locale;
+    document.title = "Codex CLI wiki";
     elements.brandEyebrow.textContent = ui().brandEyebrow;
     elements.brandName.textContent = ui().brandName;
+    elements.brandCopy.textContent = ui().brandCopy;
     elements.pageEyebrow.textContent = ui().pageEyebrow;
     elements.searchLabel.textContent = ui().searchLabel;
     elements.searchInput.placeholder = ui().searchPlaceholder;
+    elements.footerLabel.textContent = ui().footerLabel;
     elements.tocEyebrow.textContent = ui().tocEyebrow;
-    elements.mobileToggleText.textContent = ui().mobileToggle;
+    elements.mobileToggle.textContent = ui().mobileToggle;
     elements.homeButton.textContent = ui().homeButton;
     elements.copyLinkButton.textContent = ui().copyLink;
-    applyTheme();
+    elements.libraryLabel.textContent = ui().libraryLabel;
+    elements.toolbarLabel.textContent = ui().toolbarLabel;
   }
 
   function render() {
     applyLocaleUi();
-    renderLanguageDropdown();
+    renderLanguageSwitch();
     const doc = docsBySlug.get(state.slug) || docsBySlug.get(homeSlugFor(state.locale));
-    if (!doc) return;
-    
+    if (!doc) {
+      return;
+    }
     state.locale = doc.locale;
     window.localStorage.setItem("codexWikiLocale", state.locale);
-    document.title = "Codex CLI Wiki";
-    
+    document.title = doc.title + " · Codex CLI wiki";
+    renderHero(doc);
     renderNav();
     renderFilters();
     renderDocHeader(doc);
@@ -643,9 +768,9 @@
 
   function escapeHtml(value) {
     return String(value)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;");
   }
 
   function handleHashChange() {
@@ -656,22 +781,47 @@
     render();
   }
 
-  // Event Listeners
-  elements.searchInput.addEventListener("input", function (e) {
-    state.query = e.target.value;
+  elements.searchInput.addEventListener("input", function (event) {
+    state.query = event.target.value;
     renderSearch();
   });
 
   elements.copyLinkButton.addEventListener("click", function () {
-    navigator.clipboard.writeText(window.location.href)
-      .then(function () {
-        elements.copyLinkButton.textContent = ui().copied;
-        setTimeout(function () { elements.copyLinkButton.textContent = ui().copyLink; }, 1200);
-      })
-      .catch(function () {
-        elements.copyLinkButton.textContent = ui().copyFailed;
-        setTimeout(function () { elements.copyLinkButton.textContent = ui().copyLink; }, 1200);
-      });
+    function resetCopyLabel(value) {
+      elements.copyLinkButton.textContent = value;
+      setTimeout(function () {
+        elements.copyLinkButton.textContent = ui().copyLink;
+      }, 1200);
+    }
+
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+      navigator.clipboard
+        .writeText(window.location.href)
+        .then(function () {
+          resetCopyLabel(ui().copied);
+        })
+        .catch(function () {
+          resetCopyLabel(ui().copyFailed);
+        });
+      return;
+    }
+
+    const helper = document.createElement("textarea");
+    helper.value = window.location.href;
+    helper.setAttribute("readonly", "");
+    helper.style.position = "fixed";
+    helper.style.opacity = "0";
+    document.body.appendChild(helper);
+    helper.select();
+
+    try {
+      document.execCommand("copy");
+      resetCopyLabel(ui().copied);
+    } catch (error) {
+      resetCopyLabel(ui().copyFailed);
+    }
+
+    document.body.removeChild(helper);
   });
 
   elements.homeButton.addEventListener("click", function () {
@@ -682,36 +832,19 @@
     elements.sidebar.classList.toggle("open");
   });
 
-  elements.langCurrent.addEventListener("click", function (e) {
-    e.stopPropagation();
-    toggleLangDropdown();
-  });
-
-  elements.themeToggle.addEventListener("click", toggleTheme);
-
-  document.addEventListener("click", function (e) {
-    if (!elements.langWrap.contains(e.target)) {
-      closeLangDropdown();
-    }
-  });
-
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "/" && document.activeElement !== elements.searchInput) {
-      e.preventDefault();
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "/" && document.activeElement !== elements.searchInput) {
+      event.preventDefault();
       elements.searchInput.focus();
       elements.searchInput.select();
     }
-    if (e.key === "Escape") {
-      closeLangDropdown();
-      if (elements.sidebar.classList.contains("open")) {
-        elements.sidebar.classList.remove("open");
-      }
+
+    if (event.key === "Escape") {
+      closeSidebar();
     }
   });
 
   window.addEventListener("hashchange", handleHashChange);
-  
-  // Initialize
-  applyTheme();
+
   handleHashChange();
 })();
