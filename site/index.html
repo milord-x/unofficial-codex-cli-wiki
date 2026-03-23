@@ -8,6 +8,16 @@
       name="description"
       content="Локальная HTML-версия wiki по Codex CLI с поиском, оглавлением и офлайновой навигацией."
     />
+    <script>
+      (function () {
+        if (window.location.protocol === "file:") {
+          return;
+        }
+        if (window.location.pathname === "/Codex-CLI-Wiki") {
+          window.location.replace("/Codex-CLI-Wiki/" + window.location.search + window.location.hash);
+        }
+      })();
+    </script>
     <link rel="stylesheet" href="./assets/style.css" />
   </head>
   <body>
