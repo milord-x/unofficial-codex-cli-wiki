@@ -2,16 +2,8 @@
   const data = window.CODEX_WIKI_DATA || { docs: [], groups: [], homeSlugs: {} };
   const docs = data.docs || [];
   const docsBySlug = new Map(docs.map((doc) => [doc.slug, doc]));
-  const availableLocales = Array.from(
-    new Set(
-      docs
-        .map(function (doc) {
-          return doc.locale;
-        })
-        .filter(Boolean)
-    )
-  );
-  const defaultLocale = availableLocales.includes("en") ? "en" : availableLocales[0] || "en";
+  const availableLocales = ["en", "ru", "kk", "zh", "es"];
+  const defaultLocale = "en";
 
   const UI = {
     ru: {
