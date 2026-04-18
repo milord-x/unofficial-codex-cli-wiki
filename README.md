@@ -6,6 +6,22 @@
 
 Independent English edition of the local Codex CLI wiki.
 
+## Quick start
+
+Clone the repository and open the local wiki launcher:
+
+```bash
+git clone https://github.com/milord-x/Codex-CLI-Wiki.git
+cd Codex-CLI-Wiki
+wiki codex
+```
+
+If you only want to rebuild the static HTML output:
+
+```bash
+wiki codex --build-only
+```
+
 ## What this contains
 
 - structured daily-use documentation for Codex CLI;
